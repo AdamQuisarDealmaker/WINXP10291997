@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Starium Paradise Island</title>
+<style>
+  @font-face {
+    font-family: 'Tahoma Fallback';
+    src: local('Tahoma'), local('Verdana');
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Tahoma Fallback', Tahoma, Verdana, Geneva, sans-serif;
+    font-size: 11px;
+    overflow: hidden;
+  }
+
+  /* ---------- DESKTOP ---------- */
+  #desktop {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url('bliss.jpg') center center / cover no-repeat;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .desktop-icon {
+    position: absolute;
+    width: 75px;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .desktop-icon .icon-glyph {
+    width: 40px; height: 40px;
+    margin: 0 auto 4px;
+    background: linear-gradient(180deg,#fff 0%,#dfe9f5 100%);
+    border: 1px solid #4a7fbf;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.4);
+  }
+  .desktop-icon span { font-size: 11px; }
+  .desktop-icon:focus, .desktop-icon.selected .icon-glyph {
+    outline: 1px dotted #fff;
+    background: rgba(49,106,197,.4);
+  }
+
+  /* ---------- WINDOW ---------- */
+  .xp-window {
+    position: absolute;
+    min-width: 320px;
+    background: #ece9d8;
+    border: 1px solid #0831d9;
+    border-radius: 8px 8px 3px 3px;
+    box-shadow: 3px 3px 10px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .xp-titlebar {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 3px 3px 3px 6px;
+    background: linear-gradient(180deg, #2e6cd6 0%, #4e97ec 8%, #3a7dea 40%, #2058d6 92%, #163f9e 100%);
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: grab;
+    gap: 6px;
+  }
+  .xp-titlebar img.tb-icon { width:16px; height:16px; }
+  .xp-titlebar .tb-text { flex: 1; text-shadow: 1px 1px 1px rgba(0,0,0,.4); }
+  .tb-btn {
+    width: 21px; height: 20px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 3px;
+    background: linear-gradient(180deg,#5b9df0,#2f6fd6);
+    color: #fff; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .tb-btn.close { background: linear-gradient(180deg,#f2897a,#d5352a); }
+  .tb-btn:hover { filter: brightness(1.15); }
+
+  .xp-menubar {
+    background: #ece9d8;
+    border-bottom: 1px solid #b5b0a1;
+    padding: 3px 6px;
+    display: flex;
+    gap: 14px;
+    font-size: 11px;
+  }
+  .xp-menubar span { cursor: default; }
+  .xp-menubar span:hover { background: #316ac5; color: #fff; padding: 0 2px; }
+
+  .xp-toolbar {
+    background: linear-gradient(180deg,#f4f2ea,#e3e0d3);
+    border-bottom: 1px solid #b5b0a1;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .xp-toolbar .addr-box {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #7f9db9;
+    border-radius: 2px;
+    padding: 2px 6px;
+    color: #333;
+  }
+
+  .xp-content {
+    background: #fff;
+    padding: 16px 20px;
+    height: 260px;
+    overflow: auto;
+    color: #000;
+    line-height: 1.5;
+  }
+  .xp-content h1 {
+    font-size: 20px;
+    color: #0a3d91;
+    border-bottom: 2px solid #a9c6f0;
+    padding-bottom: 6px;
+    margin-top: 0;
+  }
+  .xp-content a { color: #0645AD; }
+  .xp-content h2 {
+    font-size: 15px;
+    color: #0a3d91;
+    margin: 22px 0 8px;
+  }
+  .xp-content .timeline {
+    list-style: none;
+    margin: 0; padding: 0;
+    border-left: 3px solid #a9c6f0;
+  }
+  .xp-content .timeline li {
+    position: relative;
+    padding: 4px 0 10px 16px;
+  }
+  .xp-content .timeline li::before {
+    content: "";
+    position: absolute;
+    left: -7px; top: 8px;
+    width: 10px; height: 10px;
+    background: #3a7dea;
+    border: 2px solid #fff;
+    border-radius: 50%;
+  }
+  .xp-content .glitch {
+    color: #c40000;
+    font-weight: bold;
+    letter-spacing: .5px;
+  }
+  .xp-content .letter {
+    background: #fdfcf5;
+    border: 1px dashed #b5aa7a;
+    padding: 14px 16px;
+    margin-top: 8px;
+    font-style: italic;
+    color: #333;
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+  .xp-content .signature {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    font-style: normal;
+    font-weight: bold;
+    color: #0a3d91;
+  }
+
+  .xp-statusbar {
+    background: #ece9d8;
+    border-top: 1px solid #fff;
+    box-shadow: 0 -1px 0 #b5b0a1;
+    padding: 3px 8px;
+    font-size: 10px;
+    color: #333;
+  }
+
+  /* generic XP button, used inside content for demo */
+  .xp-button {
+    font-family: inherit;
+    background: linear-gradient(180deg,#fefefe,#ece9d8 45%,#d9d5c3);
+    border: 1px solid #9b9b8e;
+    border-radius: 3px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .xp-button:active { background: #d9d5c3; }
+
+  /* ---------- TASKBAR ---------- */
+  #taskbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 32px;
+    background: linear-gradient(180deg, #2c5cc9 0%, #3f7de0 4%, #2358c9 50%, #1a4bb8 60%, #0f3aa0 100%);
+    border-top: 1px solid #6a9ef0;
+    display: flex;
+    align-items: center;
+    z-index: 500;
+  }
+  #start-btn {
+    height: 30px;
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 14px 0 8px;
+    background: linear-gradient(180deg,#6fce4e,#3a9c1f 45%,#2c8a12);
+    border-radius: 0 10px 10px 0;
+    border: 1px solid #1f6e0c;
+    color: #fff;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  #start-btn .flag {
+    width: 18px; height: 18px;
+    background: conic-gradient(from 0deg,#f25022 0 90deg,#7fba00 90deg 180deg,#00a4ef 180deg 270deg,#ffb900 270deg 360deg);
+    border-radius: 2px;
+  }
+  #taskbar-tasks {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    padding: 0 8px;
+    height: 26px;
+    align-items: center;
+  }
+  .task-btn {
+    background: linear-gradient(180deg,#3f7de0,#1c4fbd);
+    border: 1px solid #12327d;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 11px;
+    padding: 3px 10px;
+    max-width: 160px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    cursor: pointer;
+  }
+  .task-btn.active {
+    background: linear-gradient(180deg,#1c4fbd,#0f3aa0);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.5);
+  }
+  #tray {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 10px;
+    height: 30px;
+    background: linear-gradient(180deg,#1a4bb8,#0f3aa0);
+    border-left: 1px solid #274f9e;
+    color: #fff;
+    font-size: 11px;
+  }
+
+  /* ---------- START MENU ---------- */
+  #start-menu {
+    position: absolute;
+    bottom: 32px;
+    left: 0;
+    width: 330px;
+    background: #ece9d8;
+    border: 1px solid #0831d9;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 3px 0 12px rgba(0,0,0,.5);
+    display: none;
+    overflow: hidden;
+    z-index: 600;
+  }
+  #start-menu.open { display: block; }
+  .sm-header {
+    background: linear-gradient(180deg,#3a7dea,#1c4fbd);
+    color: #fff;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    font-weight: bold; font-size: 14px;
+  }
+  .sm-header .avatar {
+    width: 34px; height: 34px;
+    background: #fff;
+    border: 2px solid #fff;
+    border-radius: 4px;
+  }
+  .sm-body { display: flex; min-height: 260px; }
+  .sm-left { flex: 1; background: #fff; padding: 8px 0; }
+  .sm-right { width: 130px; background: linear-gradient(180deg,#d3dced,#b9c9ea); padding: 8px 0; }
+  .sm-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .sm-item:hover { background: #316ac5; color: #fff; }
+  .sm-item .sm-ico {
+    width: 22px; height: 22px;
+    background: linear-gradient(180deg,#fff,#cfe0f5);
+    border: 1px solid #7f9db9;
+    border-radius: 3px;
+  }
+  .sm-divider { border-top: 1px solid #a9c6f0; margin: 4px 0; }
+  #start-menu .sm-footer {
+    background: linear-gradient(180deg,#3a7dea,#1c4fbd);
+    padding: 5px 10px;
+    display: flex; justify-content: flex-end;
+  }
+  .sm-footer .xp-button { font-size: 10px; padding: 3px 10px; }
+</style>
+</head>
+<body>
+
+<div id="desktop">
+
+  <div class="desktop-icon" style="top:16px; left:16px;" ondblclick="openWindow()">
+    <div class="icon-glyph"></div>
+    <span>Meu Computador</span>
+  </div>
+  <div class="desktop-icon" style="top:100px; left:16px;" ondblclick="openWindow()">
+    <div class="icon-glyph"></div>
+    <span>Lixeira</span>
+  </div>
+  <div class="desktop-icon" style="top:184px; left:16px;" ondblclick="openWindow()">
+    <div class="icon-glyph"></div>
+    <span>S.P.I. — Adam TDM.html</span>
+  </div>
+
+  <!-- ===== JANELA ===== -->
+  <div class="xp-window" id="win1" style="top:40px; left:90px; width:620px;">
+    <div class="xp-titlebar" id="drag-handle">
+      <div style="width:16px;height:16px;background:#fff;border-radius:2px;"></div>
+      <div class="tb-text">Starium Paradise Island - Windows Internet Explorer</div>
+      <div class="tb-btn">_</div>
+      <div class="tb-btn">▢</div>
+      <div class="tb-btn close">×</div>
+    </div>
+    <div class="xp-menubar">
+      <span>Arquivo</span><span>Editar</span><span>Exibir</span><span>Favoritos</span><span>Ferramentas</span><span>Ajuda</span>
+    </div>
+    <div class="xp-toolbar">
+      <div class="xp-button">◀ Voltar</div>
+      <div class="addr-box">http://www.starium-paradise-island.spi/inicio.htm</div>
+      <div class="xp-button">Ir</div>
+    </div>
+    <div class="xp-content" style="height:340px;">
+      <h1>Starium Paradise Island</h1>
+      <p>Olá senhoras e senhores! Aqui é o Adam The Dealmaker, fundador e dono da S.P.I.
+      E fico feliz em abri-lá para o público! Humanos, pecadores, vencedores, anjos,
+      arcanjos, demônios, hellborns, metamorfos, híbridos, e várias outras espécimes são
+      bem-vindas aqui!! Eu sei, eu sei... sou um "dealmaker" e eles não são muito gente
+      boa... mas não se preocupem... os outros estão BEEEEEEEEEEEEEEEEEEEEEEEEEM longe
+      daqui. Ah, e a ilha é perfeita para festas, casamentos, e relaxamento — um ótimo
+      lugar para passarem suas férias! Espero que gostem da S.P.I. Aqui é Adam TDMS se
+      despedindo, até mais!!!</p>
+
+      <h2>A História da Ilha</h2>
+      <ul class="timeline">
+        <li><strong>1978 D.C.</strong> — A não muito tempo atrás uma ilha foi descoberta...
+        Uma ilha da qual ninguém nunca teve coragem de ir... Na dimensão H0U53FNF...
+        Uma pessoa chamada Chinin Stars criou coragem e foi com sua família para a ilha...
+        Lá eles viveram alegremente — <span class="glitch">[NÃ0 M3 DE1X3 4QUI]</span></li>
+        <li><strong>1987 D.C.</strong> — A Ilha Star é inaugurada, com a família Stars se
+        nomeando como a "Família Real" — <span class="glitch">[CH1N0 1S DEAD]</span></li>
+        <li><strong>1996 D.C.</strong> — A Ilha Star é atacada por um bombardeio,
+        destruindo tudo, quase todos os moradores foram mortos —
+        <span class="glitch">[Z0MBI3, B0B, TH3Y ARE DE4D.]</span></li>
+        <li><strong>2025 D.C.</strong> — S.P.I. é reinaugurada, sob nova liderança de
+        nosso querido presidente Adam! O 1° Anjo na S.P.I. decidiu trazer de volta a
+        ilha, querendo ser melhor que toda a sua família... <span class="glitch">[FR4CASSADO]</span>...
+        Zombie, o Zumbi que tentou manter a ilha estável, acabou morrendo... Porém ADAM
+        (Zombie versão humana/metamorfa), que sobreviveu aos eventos passados, assumiu
+        seu lugar e conseguiu manter a ilha estável...</li>
+      </ul>
+
+      <h2>Zombie — Origens</h2>
+      <p>Zombie nasceu em 29/10/1973 em uma família criminosa e corrupta... os
+      Dealmakers. Em 15/11/1985, Zombie ajuda sua família em um assalto e, como
+      recompensa, ganha um par de socos-ingleses de presente de aniversário atrasado.
+      Em 27/10/1995, com seus 21 anos, muda de cidade e vai para uma cidadezinha
+      sobrenatural; lá começa a explorar a cidade, rouba algumas lojas, e constrói uma
+      casinha no meio da floresta. Ali, Zombie começa a fazer experimentos. Em
+      30/10/1997, morre com 24 anos...</p>
+
+      <h2>Carta de Despedida — Dimensão do Estilhaços SMP</h2>
+      <div class="letter">"a mente dos humanos é algo fraco, não é? facilmente enganados... facilmente iludidos... tudo por poder... tudo por ganância... que pena... foi divertido ficar nesta dimensão... mas... minha jornada e meu legado acabam por aqui... foi bom conhecer vocês... aqui é Adam The Dealmaker, escrevendo o seu fim... o fim de sua jornada... uma jornada que marcou muitos... que muitos amaram... uma jornada de romance... uma jornada de paixão, aventura, ficção científica... a minha história acaba hoje... dia 06/01/2026... eu amei vocês... eu experimentei amor... experimentei sentimentos humanos novamente... porém, como vocês... eu aprendi a ser ganancioso... aprendi a fazer de tudo por liberdade... as cordas não mais me prendem, as algemas finalmente me libertaram... para onde irei?... para além da compreensão humana e animal... Medusa, Bulba, Fye, Lótus, Eyra, Mari, River, mãe Emma, à todos da ilha Estilhaços... expresso eu, o meu ato de gratidão por todos, porém tudo o que vivemos... passamos... serão apenas memórias... eu configurei o portal com o meu Beacon, e tirei ele para que nunca mais possa ser ativo... 52 anos disfarçados em 24 anos humanos... eu amo vocês, e minha fortuna? nah... eu não tinha fortuna nenhuma... não tinha nada de especial... somente memórias... então... com vocês eu compartilho elas... a todos que me conheceram... saibam... nós nos veremos novamente, em algum dia ensolarado... até mais, meus amigos :]
+        <span class="signature">~ Atensiosamente, Adam Quisar DealMaker</span>
+      </div>
+    </div>
+    <div class="xp-statusbar">Concluído</div>
+  </div>
+
+</div>
+
+<div id="taskbar">
+  <div id="start-btn" onclick="toggleStart()">
+    <div class="flag"></div> start
+  </div>
+  <div id="taskbar-tasks">
+    <div class="task-btn active">Starium Paradise Island - Windows Internet Explorer</div>
+  </div>
+  <div id="tray">
+    <span id="clock">00:00</span>
+  </div>
+</div>
+
+<div id="start-menu">
+  <div class="sm-header">
+    <div class="avatar"></div>
+    Usuário
+  </div>
+  <div class="sm-body">
+    <div class="sm-left">
+      <div class="sm-item"><div class="sm-ico"></div>Internet Explorer</div>
+      <div class="sm-item"><div class="sm-ico"></div>Outlook Express</div>
+      <div class="sm-item"><div class="sm-ico"></div>Bloco de Notas</div>
+      <div class="sm-item"><div class="sm-ico"></div>Paint</div>
+      <div class="sm-divider"></div>
+      <div class="sm-item"><div class="sm-ico"></div>Todos os programas ▶</div>
+    </div>
+    <div class="sm-right">
+      <div class="sm-item">Meus Documentos</div>
+      <div class="sm-item">Meus Locais de Rede</div>
+      <div class="sm-item">Painel de Controle</div>
+      <div class="sm-divider"></div>
+      <div class="sm-item">Ajuda e Suporte</div>
+      <div class="sm-item">Executar...</div>
+    </div>
+  </div>
+  <div class="sm-footer">
+    <div class="xp-button">Fazer logoff</div>
+    <div class="xp-button">Desligar</div>
+  </div>
+</div>
+
+<script>
+  // relógio
+  function tick() {
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('clock').textContent = h + ':' + m;
+  }
+  tick(); setInterval(tick, 1000*30);
+
+  // start menu
+  function toggleStart() {
+    document.getElementById('start-menu').classList.toggle('open');
+  }
+  document.getElementById('desktop').addEventListener('click', (e)=>{
+    if (!e.target.closest('#start-menu') && !e.target.closest('#start-btn')) {
+      document.getElementById('start-menu').classList.remove('open');
+    }
+  });
+
+  // arrastar janela
+  const win = document.getElementById('win1');
+  const handle = document.getElementById('drag-handle');
+  let dragging = false, offX = 0, offY = 0;
+  handle.addEventListener('mousedown', (e)=>{
+    dragging = true;
+    offX = e.clientX - win.offsetLeft;
+    offY = e.clientY - win.offsetTop;
+    win.style.zIndex = 100;
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    win.style.left = (e.clientX - offX) + 'px';
+    win.style.top = Math.max(0, e.clientY - offY) + 'px';
+  });
+  document.addEventListener('mouseup', ()=> dragging = false);
+
+  function openWindow(){ win.style.display='block'; win.style.zIndex=100; }
+</script>
+
+</body>
+</html>
