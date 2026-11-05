@@ -2,6 +2,29 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<!-- ===================================================================
+     MODO DA PÁGINA (roda antes da primeira pintura)
+     - Padrão: experiência glitch que termina no redirect para o Forgotten Man.
+     - Acrescente  ?xp  na URL para abrir o site XP original, intacto.
+     - Sem JavaScript, nada disso roda e o site XP original aparece normalmente.
+     =================================================================== -->
+<script>
+  (function () {
+    var xp = /[?&]xp(=|&|$)/.test(location.search);
+    window.__GX_MODE = !xp;
+    if (xp) return;
+    document.documentElement.className += ' gx';
+    // O site XP original não tem meta viewport; a experiência glitch precisa dela no celular.
+    var v = document.createElement('meta');
+    v.name = 'viewport';
+    v.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+    document.head.appendChild(v);
+    var c = document.createElement('meta');
+    c.name = 'theme-color';
+    c.content = '#000000';
+    document.head.appendChild(c);
+  })();
+</script>
 <title>Starium Paradise Island</title>
 <style>
   @font-face {
@@ -313,9 +336,121 @@
     display: flex; justify-content: flex-end;
   }
   .sm-footer .xp-button { font-size: 10px; padding: 3px 10px; }
+
+  /* =====================================================================
+     EXPERIÊNCIA GLITCH  (só vale quando <html> tem a classe .gx)
+     ===================================================================== */
+
+  /* Modo glitch: tudo preto, sem rolagem, sem gestos do navegador */
+  html.gx, html.gx body {
+    background: #000;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* O site XP original continua no arquivo, só fica oculto (acesse com ?xp) */
+  html.gx #desktop, html.gx #taskbar, html.gx #start-menu { display: none !important; }
+  /* No modo XP original o palco glitch não existe */
+  html:not(.gx) #gx-stage { display: none; }
+
+  #gx-stage {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    overflow: hidden;
+    z-index: 100000;
+    --gx-fade: 0ms;
+  }
+  /* Depois dos 10 s qualquer clique/toque leva ao destino: o cursor denuncia */
+  html.gx-unlocked #gx-stage { cursor: pointer; }
+
+  /* "Mundo": recebe tremores/deslocamentos. "Box": área das árvores, centralizada. */
+  #gx-world { position: absolute; inset: 0; will-change: transform, opacity; }
+  /* "sil-box" (silhueta, camada de BAIXO) e "box" (árvores, por cima) têm o mesmo centro/tamanho.
+     A silhueta fica fora do #gx-box de propósito: os filtros de glitch (inversão, RGB) só afetam as
+     árvores, senão o fundo preto opaco do PNG viraria um retângulo branco. */
+  #gx-sil-box, #gx-box {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);   /* tamanho (px) é definido pelo JS, em escala inteira */
+  }
+
+  .gx-tree, .gx-slice, .gx-sil {
+    position: absolute;
+    bottom: 0;                          /* ancora no pé do tronco: as duas árvores se alinham */
+    display: block;
+    max-width: none;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;         /* pixel art nítida */
+  }
+  .gx-tree { transition: opacity var(--gx-fade) linear; }
+  .gx-sil { transition: none; }          /* o fade-in da silhueta é feito pelo JS, quadro a quadro */
+  .gx-tree.on { opacity: 1; }
+  #gx-box.blend .gx-tree { mix-blend-mode: screen; }   /* sobreposição aditiva */
+
+  /* Interferência: ruído (canvas de baixa resolução), scanlines, "barra de rolagem" VHS */
+  #gx-noise {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+  #gx-scan {
+    position: absolute; inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom,
+      rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.28) 2px, rgba(0,0,0,.28) 3px);
+  }
+  #gx-roll {
+    position: absolute; left: 0; right: 0; top: -20%;
+    height: 18%;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.05), rgba(255,255,255,0));
+    animation: gx-roll 3.4s linear infinite;
+  }
+  @keyframes gx-roll { from { transform: translateY(0); } to { transform: translateY(700%); } }
+
+  /* Flash (fraco, nunca branco total) e blackout (tela 100% preta) */
+  #gx-flash, #gx-black { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  #gx-flash { background: rgba(255, 40, 140, .14); }
+  #gx-black { background: #000; }
+
+  /* Final: a imagem "desliga" como uma TV antiga (colapsa numa linha) */
+  #gx-stage.collapse #gx-world {
+    transform: scale(1.5, 0.012) !important;
+    transition: transform 110ms cubic-bezier(.7, 0, 1, .5);
+  }
+  #gx-stage.collapse #gx-box { filter: brightness(3) !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #gx-roll { animation: none; }
+  }
 </style>
 </head>
 <body>
+
+<!-- ===================================================================
+     PALCO DA EXPERIÊNCIA GLITCH (as <img> das árvores são criadas pelo JS)
+     =================================================================== -->
+<div id="gx-stage" role="img" aria-label="Tela preta em que árvores piscam e vão se corrompendo">
+  <div id="gx-world"><div id="gx-sil-box"></div><div id="gx-box"></div></div>
+  <canvas id="gx-noise"></canvas>
+  <div id="gx-scan"></div>
+  <div id="gx-roll"></div>
+  <div id="gx-flash"></div>
+  <div id="gx-black"></div>
+</div>
+
 
 <div id="desktop">
 
@@ -417,67 +552,4 @@
   </div>
   <div class="sm-body">
     <div class="sm-left">
-      <div class="sm-item"><div class="sm-ico"></div>Internet Explorer</div>
-      <div class="sm-item"><div class="sm-ico"></div>Outlook Express</div>
-      <div class="sm-item"><div class="sm-ico"></div>Bloco de Notas</div>
-      <div class="sm-item"><div class="sm-ico"></div>Paint</div>
-      <div class="sm-divider"></div>
-      <div class="sm-item"><div class="sm-ico"></div>Todos os programas ▶</div>
-    </div>
-    <div class="sm-right">
-      <div class="sm-item">Meus Documentos</div>
-      <div class="sm-item">Meus Locais de Rede</div>
-      <div class="sm-item">Painel de Controle</div>
-      <div class="sm-divider"></div>
-      <div class="sm-item">Ajuda e Suporte</div>
-      <div class="sm-item">Executar...</div>
-    </div>
-  </div>
-  <div class="sm-footer">
-    <div class="xp-button">Fazer logoff</div>
-    <div class="xp-button">Desligar</div>
-  </div>
-</div>
-
-<script>
-  // relógio
-  function tick() {
-    const d = new Date();
-    const h = String(d.getHours()).padStart(2,'0');
-    const m = String(d.getMinutes()).padStart(2,'0');
-    document.getElementById('clock').textContent = h + ':' + m;
-  }
-  tick(); setInterval(tick, 1000*30);
-
-  // start menu
-  function toggleStart() {
-    document.getElementById('start-menu').classList.toggle('open');
-  }
-  document.getElementById('desktop').addEventListener('click', (e)=>{
-    if (!e.target.closest('#start-menu') && !e.target.closest('#start-btn')) {
-      document.getElementById('start-menu').classList.remove('open');
-    }
-  });
-
-  // arrastar janela
-  const win = document.getElementById('win1');
-  const handle = document.getElementById('drag-handle');
-  let dragging = false, offX = 0, offY = 0;
-  handle.addEventListener('mousedown', (e)=>{
-    dragging = true;
-    offX = e.clientX - win.offsetLeft;
-    offY = e.clientY - win.offsetTop;
-    win.style.zIndex = 100;
-  });
-  document.addEventListener('mousemove', (e)=>{
-    if(!dragging) return;
-    win.style.left = (e.clientX - offX) + 'px';
-    win.style.top = Math.max(0, e.clientY - offY) + 'px';
-  });
-  document.addEventListener('mouseup', ()=> dragging = false);
-
-  function openWindow(){ win.style.display='block'; win.style.zIndex=100; }
-</script>
-
-</body>
-</html>
+      <div class="sm-item"><div class=
